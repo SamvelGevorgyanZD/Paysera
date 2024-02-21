@@ -2,10 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Services\CommissionService;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class CalculateCommand extends Command
 {
@@ -14,7 +12,7 @@ class CalculateCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'calculate {file}';
+    protected $signature = 'calculate';
 
     /**
      * The console command description.
@@ -28,24 +26,26 @@ class CalculateCommand extends Command
      */
     public function handle()
     {
-        $csv = $this->argument('file');
-        $rows = array_map('str_getcsv', file($csv));
+        $csv = storage_path('input.csv');
+        $fileData = file($csv);
+        $rows = array_map('str_getcsv', $fileData);
         $data = [];
+        $i = 0;
         foreach ($rows as $row) {
             $data[] = [
+                'id' => $i,
                 'date' => $row[0],
                 'user_id' => $row[1],
                 'user_type' => $row[2],
                 'operation' => $row[3],
                 'amount' => $row[4],
-                'currency' => $row[5]
+                'currency' => $row[5],
+                "eur" => exchange($row[5], 'EUR', $row[4])
             ];
+            $i++;
         }
-        $json = json_encode($data, JSON_PRETTY_PRINT);
-        $name = Str::random() . '.json';
-        Storage::put($name, $json);
-        $route = route('calculate', ['path' => $name]);
-        $response = Http::get($route);
-        dump($response->json());
+        $service = new CommissionService($data);
+        $fees = $service->calculate();
+        $this->info(implode("\n", $fees));
     }
 }

@@ -18,10 +18,6 @@ To get started with the Commission Fee Calculator, follow these steps:
    ```bash
    composer install
 
-4. Start the server:
+4. Run the following command:
    ```bash
-   php artisan serve
-
-5. Run the following command:
-   ```bash
-   php artisan calculate ./input.csv
+   php artisan calculate

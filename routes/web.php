@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CalculateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,4 +13,3 @@ use App\Http\Controllers\CalculateController;
 |
 */
 
-Route::get('/calculate/{path}', [CalculateController::class, 'index'])->name('calculate');
